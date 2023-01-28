@@ -2,20 +2,27 @@ import express, {Request, Response, NextFunction, Application} from "express";
 import errorHandler from './utilities/errorHandler';
 import config from './config/config'
 import { Server } from 'http';
-import createHttpError from "http-errors";
-const app: Application = express();
+import connect from "./config/database";
+import {Log} from "log-color-console-npm";
+import route from "./routes/route";
+import httpException from "./exceptions/exception";
+import swaggerDoc from "./utilities/swagger";
 
-// api routes
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
-    res.send('hello world!');
-})
+const app = express();
 
-// Error handler 
-app.use((req: Request, res: Response, next: NextFunction)=> {
-    next(new createHttpError.NotFound())
-})
+//middlewares
+app.use(express.json());
+app.use(express.urlencoded());
+app.use("/api/v1/parking", route);
 
-// app use statements 
 app.use(errorHandler);
+app.use(httpException)
 
-const server: Server = app.listen(config.PORT, () => { console.log(`server is on port ${config.HOST}:${config.PORT}`)});
+// listening connection
+
+app.listen(config.PORT, async () => { 
+    await connect();
+    Log.success(`server is on port ${config.HOST}:${config.PORT}`)
+    swaggerDoc(app, config.PORT);
+
+});
