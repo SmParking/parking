@@ -17,6 +17,7 @@ const config = {
   VERSION: VERSION,
   BASEPATH: BASE_PATH,
   SOURCEPATH: SOURCE_PATH,
+  API_PREFIX: `/${process.env.PREFIX}/${process.env.API_VERSION}`
 };
 
 export default config;

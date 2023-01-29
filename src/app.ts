@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction, Application } from "express";
 import errorHandler from "./utilities/errorHandler";
 import config from "./config/config";
-import { Server } from "http";
 import connect from "./config/database";
 import { Log } from "log-color-console-npm";
 import route from "./routes/route";
@@ -14,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded());
 
-app.use("/api/v1/parking", route);
+app.use(`${config.API_PREFIX}/parking`, route);
 
 app.use(errorHandler);
 app.use(httpException);

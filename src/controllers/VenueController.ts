@@ -1,21 +1,33 @@
 import { Request, Response, NextFunction } from "express";
 import Venue from "../models/Venue";
-class VenueController {
-  constructor() {}
+import { Redis } from "../utilities/Redis";
+import BaseController from "./BaseController";
+
+class VenueController extends BaseController {
+  message: String = "";
+  status = 200;
+  result: string = "";
+  redisKeyName: string = "Venues";
+  constructor() {
+    super();
+    this.message = "Venue fetch successfully.";
+  }
   // get all venue
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const venues = await Venue.find();
-      res.status(200).json(venues);
+      Redis.get(this.redisKeyName).then((res) => ( this.result = res));
+      const _venues = (this.result != null) ? await Venue.find() : this.getVenues();
+      this.httpResponse(this.status, res, _venues);
     } catch (error) {
       next(error);
     }
+    //Redis.disconnect();
   };
   // show by id method
   show = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const venue = await Venue.findById(req.params.id);
-      res.status(200).json(venue);
+      res.status(this.status).json(venue);
     } catch (error) {
       next(error);
     }
@@ -25,6 +37,7 @@ class VenueController {
     const newVenue = new Venue(req.body);
     try {
       const savedVenue = await newVenue.save();
+      this.setVenues();
       res.status(201).json(savedVenue);
     } catch (error) {
       next(error);
@@ -38,20 +51,38 @@ class VenueController {
         { $set: req.body },
         { new: true }
       );
-      res.status(200).json(updateVenue);
+      this.setVenues();
+      res.status(this.status).json(updateVenue);
     } catch (error) {
       next(error);
     }
   };
   // delete venue by id
   delete = async (req: Request, res: Response, next: NextFunction) => {
+    this.message = "Venue deleted successfully.";
     try {
       await Venue.findByIdAndDelete(req.params.id);
-      res.status(200).json("Venue has been deleted successfully.");
+      res.status(this.status).json(this.message);
     } catch (error) {
       next(error);
     }
   };
+
+  setVenues = async () => {
+    return Redis.set(this.redisKeyName, JSON.stringify(await Venue.find()));
+  };
+
+  getVenues = () => {
+
+    console.log('i am here');
+    let venues: any = [];
+     Redis.get(this.redisKeyName).then(res => {
+      venues = res;
+    }).catch(err => {
+      console.log(`Error occured during fetch from redis : ${err}`);
+    })
+    return venues;
+  }
 }
 
 export const VenueCont = new VenueController();

@@ -52,6 +52,6 @@ const VenueSchema = new mongoose.Schema({
   vehicles: {
     type: [String],
   },
-});
+}, {timestamps: true});
 
 export default VenueSchema;

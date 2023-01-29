@@ -1,7 +1,7 @@
-import express, { Request, Response, NextFunction } from "express";
+// parking endpoints goes here
+import express from "express";
 import { VenueCont as VenueController } from "../controllers/VenueController";
 const route = express.Router();
-// parking endpoints goes here
 
 // get all venue
 route.get("/", VenueController.index);
