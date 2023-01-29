@@ -6,7 +6,7 @@ import BaseController from "./BaseController";
 class VenueController extends BaseController {
   message: String = "";
   status = 200;
-  result: string = "";
+  result: any = "";
   redisKeyName: string = "Venues";
   constructor() {
     super();
@@ -15,7 +15,14 @@ class VenueController extends BaseController {
   // get all venue
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      Redis.get(this.redisKeyName).then((res) => ( this.result = res));
+      this.result = Redis.get(this.redisKeyName); //.then((res) => ( this.result = res));
+      console.log(this.result);
+      if(this.result != null) {
+        console.log('call await function');
+      } else {
+        console.log('call venue function.');
+      }
+       
       const _venues = (this.result != null) ? await Venue.find() : this.getVenues();
       this.httpResponse(this.status, res, _venues);
     } catch (error) {
@@ -73,14 +80,13 @@ class VenueController extends BaseController {
   };
 
   getVenues = () => {
-
-    console.log('i am here');
     let venues: any = [];
      Redis.get(this.redisKeyName).then(res => {
       venues = res;
     }).catch(err => {
       console.log(`Error occured during fetch from redis : ${err}`);
     })
+    console.log('before sending...');
     return venues;
   }
 }

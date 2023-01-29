@@ -12,6 +12,8 @@ class BaseController {
     httpResponseError = (status:any, res:Response, message: string) => {
 
     }
+
+    
 }
 
 export default BaseController;
