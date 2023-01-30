@@ -1,27 +1,27 @@
 import { createClient } from "redis";
 
 class RedisClient {
-    client: any;
+  client: any;
 
-    constructor() {
-        this.client = createClient();
-        this.client.connect();
-    }
-    
-    // set redis key
-    set = async (key: string, value: any) => {
-        await this.client.set(key, value);
-    };
+  constructor() {
+    this.client = createClient();
+    this.client.connect();
+  }
 
-    // get redis key
-    get = async (key: string) => {
-        return await this.client.get(key);
-    };
+  // set redis key
+  set = async (key: string, value: any) => {
+    await this.client.set(key, value);
+  };
 
-    // disconnect redis
-    disconnect = async () => {
-        await this.client.disconnect();
-    };
+  // get redis key
+  get = async (key: string) => {
+    return await this.client.get(key);
+  };
+
+  // disconnect redis
+  disconnect = async () => {
+    await this.client.disconnect();
+  };
 }
 
 export const Redis = new RedisClient();

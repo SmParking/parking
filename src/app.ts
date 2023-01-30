@@ -6,9 +6,11 @@ import { Log } from "log-color-console-npm";
 import route from "./routes/route";
 import httpException from "./exceptions/exception";
 import swaggerDoc from "./utilities/swagger";
+import cors from "cors";
 
 const app = express();
 
+app.use(cors());
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded());

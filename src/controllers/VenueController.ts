@@ -17,13 +17,14 @@ class VenueController extends BaseController {
     try {
       this.result = Redis.get(this.redisKeyName); //.then((res) => ( this.result = res));
       console.log(this.result);
-      if(this.result != null) {
-        console.log('call await function');
+      if (this.result != null) {
+        console.log("call await function");
       } else {
-        console.log('call venue function.');
+        console.log("call venue function.");
       }
-       
-      const _venues = (this.result != null) ? await Venue.find() : this.getVenues();
+
+      const _venues =
+        this.result != null ? await Venue.find() : this.getVenues();
       this.httpResponse(this.status, res, _venues);
     } catch (error) {
       next(error);
@@ -81,14 +82,16 @@ class VenueController extends BaseController {
 
   getVenues = () => {
     let venues: any = [];
-     Redis.get(this.redisKeyName).then(res => {
-      venues = res;
-    }).catch(err => {
-      console.log(`Error occured during fetch from redis : ${err}`);
-    })
-    console.log('before sending...');
+    Redis.get(this.redisKeyName)
+      .then((res) => {
+        venues = res;
+      })
+      .catch((err) => {
+        console.log(`Error occured during fetch from redis : ${err}`);
+      });
+    console.log("before sending...");
     return venues;
-  }
+  };
 }
 
 export const VenueCont = new VenueController();
