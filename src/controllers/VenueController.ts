@@ -72,7 +72,7 @@ class VenueController extends BaseController {
         { $set: req.body },
         { new: true }
       );
-      this.setVenues();
+      this.setVenues(Venue);
       res.status(this.status).json(updateVenue);
     } catch (error) {
       next(error);
