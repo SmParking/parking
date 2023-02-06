@@ -4,10 +4,32 @@ import { Redis } from "../utilities/Redis";
 import BaseController from "./BaseController";
 
 class VenueController extends BaseController {
-  message: String = "";
-  status = 200;
-  result: any = "";
-  redisKeyName: string = "Venues";
+  /**
+   * message string
+   */
+  protected message: String = "";
+
+  /**
+   * status
+   */
+  public status = 200;
+
+  /**
+   *@param result array
+   */
+  protected result: Array<any> = [];
+
+  /**
+   * @param Redis Venue key
+   *
+   */
+  protected redisKeyName: string = "Venues";
+
+  /**
+   * @param data array
+   */
+  private data: Array<any> = [];
+
   constructor() {
     super();
     this.message = "Venue fetch successfully.";
@@ -15,17 +37,13 @@ class VenueController extends BaseController {
   // get all venue
   index = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      this.result = Redis.get(this.redisKeyName); //.then((res) => ( this.result = res));
-      console.log(this.result);
-      if (this.result != null) {
-        console.log("call await function");
-      } else {
-        console.log("call venue function.");
-      }
+      this.result = (
+        !this.getVenues() ? this.getVenues() : await Venue.find()
+      ).sort((r1: any, r2): any =>
+        r1.createdAt > r2.createdAt ? 1 : r1.createdAt < r2.createdAt ? -1 : 0
+      );
 
-      const _venues =
-        this.result != null ? await Venue.find() : this.getVenues();
-      this.httpResponse(this.status, res, _venues);
+      this.httpResponse(this.status, res, this.result);
     } catch (error) {
       next(error);
     }
@@ -81,16 +99,14 @@ class VenueController extends BaseController {
   };
 
   getVenues = () => {
-    let venues: any = [];
+    let _vm = this;
     Redis.get(this.redisKeyName)
       .then((res) => {
-        venues = res;
+        _vm.data = JSON.parse(res);
       })
-      .catch((err) => {
-        console.log(`Error occured during fetch from redis : ${err}`);
-      });
-    console.log("before sending...");
-    return venues;
+      .catch((error) => console.log(`found error in redis ${error}`));
+
+    return _vm.data;
   };
 }
 

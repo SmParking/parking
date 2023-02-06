@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction, Application } from "express";
+import express, {Application } from "express";
 import errorHandler from "./utilities/errorHandler";
 import config from "./config/config";
 import connect from "./config/database";
@@ -8,7 +8,7 @@ import httpException from "./exceptions/exception";
 import swaggerDoc from "./utilities/swagger";
 import cors from "cors";
 
-const app = express();
+const app: Application = express();
 
 app.use(cors());
 //middlewares
