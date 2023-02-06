@@ -25,11 +25,6 @@ class VenueController extends BaseController {
    */
   protected redisKeyName: string = "Venues";
 
-  /**
-   * @param data array
-   */
-  private data: Array<any> = [];
-
   constructor() {
     super();
     this.message = "Venue fetch successfully.";
@@ -39,7 +34,7 @@ class VenueController extends BaseController {
     try {
       this.result = (
         !this.getVenues() ? this.getVenues() : await Venue.find()
-      ).sort((r1: any, r2): any =>
+      ).sort((r1: any, r2: any) =>
         r1.createdAt > r2.createdAt ? 1 : r1.createdAt < r2.createdAt ? -1 : 0
       );
 
@@ -53,7 +48,7 @@ class VenueController extends BaseController {
   show = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const venue = await Venue.findById(req.params.id);
-      res.status(this.status).json(venue);
+      this.httpResponse(this.status, res, venue);
     } catch (error) {
       next(error);
     }
@@ -63,7 +58,7 @@ class VenueController extends BaseController {
     const newVenue = new Venue(req.body);
     try {
       const savedVenue = await newVenue.save();
-      this.setVenues();
+      this.setVenues(Venue);
       res.status(201).json(savedVenue);
     } catch (error) {
       next(error);
@@ -92,21 +87,6 @@ class VenueController extends BaseController {
     } catch (error) {
       next(error);
     }
-  };
-
-  setVenues = async () => {
-    return Redis.set(this.redisKeyName, JSON.stringify(await Venue.find()));
-  };
-
-  getVenues = () => {
-    let _vm = this;
-    Redis.get(this.redisKeyName)
-      .then((res) => {
-        _vm.data = JSON.parse(res);
-      })
-      .catch((error) => console.log(`found error in redis ${error}`));
-
-    return _vm.data;
   };
 }
 
